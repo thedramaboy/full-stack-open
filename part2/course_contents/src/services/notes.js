@@ -1,5 +1,5 @@
 import axios from "axios";
-const baseUrl = "/api/notes";
+const baseUrl = "https://fso-backend.vercel.app/api/notes";
 
 const getAll = () => {
   const request = axios.get(baseUrl);
