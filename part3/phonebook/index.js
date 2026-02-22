@@ -1,7 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const app = express();
 const cors = require("cors");
+const Person = require("./model/person");
 
 app.use(cors());
 app.use(express.json());
@@ -21,57 +23,33 @@ app.use(
   }),
 );
 
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+let persons = [];
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
-app.get("/info", (request, response) => {
-  const date = new Date();
-  const responseText = `
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${date}</p>
-    `;
-  response.send(responseText);
-  console.log(`Phonebook has info for ${persons.length} people`);
-  console.log(`Time: ${date}`);
-});
+// app.get("/info", (request, response) => {
+//   const date = new Date();
+//   const responseText = `
+//         <p>Phonebook has info for ${persons.length} people</p>
+//         <p>${date}</p>
+//     `;
+//   response.send(responseText);
+//   console.log(`Phonebook has info for ${persons.length} people`);
+//   console.log(`Time: ${date}`);
+// });
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  const person = persons.find((person) => person.id === id);
-  if (person) {
+  Person.findById(request.params.id).then((person) => {
     response.json(person);
-  } else {
-    response.statusMessage = "No person found";
-    response.status(404).end();
-  }
+  });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -81,9 +59,9 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
-const getRandomId = () => {
-  return Math.floor(Math.random() * 10000);
-};
+// const getRandomId = () => {
+//   return Math.floor(Math.random() * 10000);
+// };
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
@@ -94,22 +72,23 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const nameExists = persons.find((person) => person.name === body.name);
+  // const nameExists = persons.find((person) => person.name === body.name);
 
-  if (nameExists) {
-    return response.status(400).json({
-      error: "Name must be unique",
-    });
-  }
+  // if (nameExists) {
+  //   return response.status(400).json({
+  //     error: "Name must be unique",
+  //   });
+  // }
 
-  const person = {
-    id: String(getRandomId()),
+  const person = new Person({
+    // id: String(getRandomId()),
     name: body.name,
     number: body.number,
-  };
+  });
 
-  persons = persons.concat(person);
-  response.json(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 app.use(unknownEndpoint);

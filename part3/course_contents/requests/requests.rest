@@ -6,6 +6,6 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-    "content": "through REST client",
+    "content": "Ensure that everything still works",
     "important": true
 }
