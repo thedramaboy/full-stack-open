@@ -33,7 +33,7 @@ const App = () => {
     if (persons.find(isAdded)) {
       if (
         window.confirm(
-          `${newName} is already added to phonebook, replace the old number with a new one?`
+          `${newName} is already added to phonebook, replace the old number with a new one?`,
         )
       ) {
         const updatedPerson = persons.find(isAdded);
@@ -43,8 +43,8 @@ const App = () => {
           .then((returnedPerson) => {
             setPersons(
               persons.map((person) =>
-                person.id === updatedPerson.id ? returnedPerson : person
-              )
+                person.id === updatedPerson.id ? returnedPerson : person,
+              ),
             );
             setNewName("");
             setNewNumber("");
@@ -58,15 +58,23 @@ const App = () => {
           });
       }
     } else {
-      personService.create(personObject).then((returnedPersons) => {
-        setMessage({ text: `Added ${newName}`, type: `success` });
-        setTimeout(() => {
-          setMessage({ text: null, type: null });
-        }, 5000);
-        setPersons(persons.concat(returnedPersons));
-        setNewName("");
-        setNewNumber("");
-      });
+      personService
+        .create(personObject)
+        .then((returnedPersons) => {
+          setMessage({ text: `Added ${newName}`, type: `success` });
+          setTimeout(() => {
+            setMessage({ text: null, type: null });
+          }, 5000);
+          setPersons(persons.concat(returnedPersons));
+          setNewName("");
+          setNewNumber("");
+        })
+        .catch((error) => {
+          const errorMessage = error.response.data.error;
+          setMessage({ text: errorMessage, type: `error` });
+          setTimeout(() => setMessage({ text: null, type: null }), 5000);
+          console.log(errorMessage);
+        });
     }
   };
 
