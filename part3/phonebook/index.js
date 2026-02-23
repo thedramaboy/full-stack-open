@@ -3,11 +3,12 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const Person = require("./model/person");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static("dist"));
+app.use(express.static(path.join(__dirname, "dist")));
 
 app.use(
   morgan(function (tokens, req, res) {
