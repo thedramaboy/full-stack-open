@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import countryService from "./services/countries";
+import Country from "./components/Country";
 
 const App = () => {
   const [countries, setCountries] = useState(null);
@@ -26,6 +27,10 @@ const App = () => {
           country.name.common.toLowerCase().includes(newCountry.toLowerCase()),
         );
 
+  const toggleToShow = (name) => {
+    setNewCountry(name);
+  };
+
   return (
     <div>
       <p>
@@ -35,23 +40,17 @@ const App = () => {
       {countriesToShow.length > 10 && newCountry !== "" ? (
         <div>Too many matches, specify another filter</div>
       ) : countriesToShow.length === 1 && newCountry !== "" ? (
-        countriesToShow.map((country) => (
-          <div key={country.name.common}>
-            <h1>{country.name.common}</h1>
-            <p>Capital {country.capital[0]}</p>
-            <p>Area {country.area}</p>
-            <h2>Languages</h2>
-            <ul>
-              {Object.values(country.languages).map((language) => (
-                <li key={language}>{language}</li>
-              ))}
-            </ul>
-            <img src={country.flags.png} alt="flag"/>
-          </div>
-        ))
+        countriesToShow.map((country) => <Country country={country} />)
       ) : (
         countriesToShow.map((country) => (
-          <p key={country.name.common}>{country.name.common}</p>
+          <div key={country.name.common}>
+            <p>
+              {country.name.common}{" "}
+              <button onClick={() => toggleToShow(country.name.common)}>
+                Show
+              </button>
+            </p>
+          </div>
         ))
       )}
     </div>
