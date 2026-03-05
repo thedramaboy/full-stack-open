@@ -1,17 +1,36 @@
-const { test, after, beforeEach } = require("node:test");
+const { describe, test, after, beforeEach } = require("node:test");
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
 const assert = require("node:assert");
+const bcrypt = require("bcrypt");
 
 const helper = require("./test_helper");
 const Blog = require("../models/blogs");
+const User = require("../models/users");
 
 const api = supertest(app);
+let token;
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  await Blog.insertMany(helper.initialBlogs);
+  await User.deleteMany({});
+
+  const passwordHash = await bcrypt.hash("password", 10);
+  const user = new User({ username: "testuser", passwordHash });
+  await user.save();
+
+  const loginResponse = await api
+    .post("/api/login")
+    .send({ username: "testuser", password: "password" });
+
+  token = loginResponse.body.token;
+
+  const initialBlogsWithUser = helper.initialBlogs.map((blog) => ({
+    ...blog,
+    user: user._id,
+  }));
+  await Blog.insertMany(initialBlogsWithUser);
 });
 
 test("blogs are returned as json", async () => {
@@ -50,6 +69,7 @@ test("an HTTP POST request to create a new blog post", async () => {
 
   await api
     .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-type", /application\/json/);
@@ -72,6 +92,7 @@ test("blog without likes is set to be zero", async () => {
 
   const response = await api
     .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-type", /application\/json/);
@@ -86,7 +107,11 @@ test("blog without title is not added", async () => {
     likes: 1,
   };
 
-  await api.post("/api/blogs").send(newBlog).expect(400);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlog)
+    .expect(400);
 
   const blogsAtEnd = await helper.blogsInDb();
   assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
@@ -96,7 +121,10 @@ test("succeeds with status code 204 if id is valid", async () => {
   const blogsAtStart = await helper.blogsInDb();
   const blogToDelete = blogsAtStart[0];
 
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .set("Authorization", `Bearer ${token}`)
+    .expect(204);
 
   const blogsAtEnd = await helper.blogsInDb();
   const blogIds = blogsAtEnd.map((blog) => blog.id);
@@ -119,6 +147,57 @@ test("succeeds to alter blog", async () => {
   const blogsAtEnd = await helper.blogsInDb();
   const titles = blogsAtEnd.map((blog) => blog.title);
   assert(titles.includes("Test put title"));
+});
+
+describe("when there is initially some blogs saved", () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({});
+    await User.deleteMany({});
+
+    const passwordHash = await bcrypt.hash("password", 10);
+    const user = new User({ username: "testuser", passwordHash });
+    await user.save();
+
+    const loginResponse = await api
+      .post("/api/login")
+      .send({ username: "testuser", password: "password" });
+
+    token = loginResponse.body.token;
+  });
+
+  test("a valid blog can be added", async () => {
+    await Blog.insertMany(helper.initialBlogs);
+    const newBlog = {
+      title: "Async/Await is awesome",
+      author: "Nate",
+      url: "https://test.com",
+      likes: 5,
+    };
+
+    await api
+      .post("/api/blogs")
+      .set("Authorization", `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201)
+      .expect("Content-Type", /application\/json/);
+
+    const blogsAtEnd = await helper.blogsInDb();
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1);
+  });
+
+  test("adding a blog fails with 401 Unauthorized if token is not provided", async () => {
+    await Blog.insertMany(helper.initialBlogs);
+    const newBlog = {
+      title: "This should fail",
+      author: "No Token",
+      url: "https://fail.com",
+    };
+
+    await api.post("/api/blogs").send(newBlog).expect(401);
+
+    const blogsAtEnd = await helper.blogsInDb();
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
+  });
 });
 
 after(async () => {

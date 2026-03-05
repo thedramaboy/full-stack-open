@@ -32,3 +32,6 @@ Content-Type: application/json
     "password": "DomeZa"
 }
 
+###
+
+DELETE http://localhost:3003/api/blogs/69a79914e11480f890e0003c
