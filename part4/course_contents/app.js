@@ -6,8 +6,10 @@ const middleware = require("./utils/middleware");
 const notesRouter = require("./controllers/notes");
 const usersRouter = require("./controllers/users");
 const loginRouter = require("./controllers/login");
+const cors = require("cors");
 
 const app = express();
+app.use(cors());
 
 logger.info("connecting to", config.MONGODB_URI);
 
