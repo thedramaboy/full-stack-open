@@ -83,6 +83,8 @@ const App = () => {
     </Togglable>
   );
 
+  console.log(blogs);
+
   return (
     <div>
       {!user && loginForm()}
