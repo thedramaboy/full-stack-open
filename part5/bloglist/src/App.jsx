@@ -72,7 +72,7 @@ const App = () => {
   const blogDescription = () => (
     <div>
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateLike={updateBlog}/>
       ))}
     </div>
   );
@@ -83,7 +83,10 @@ const App = () => {
     </Togglable>
   );
 
-  console.log(blogs);
+  const updateBlog = async (id, blogObject) => {
+    const updatedBlog = await blogService.update(id, blogObject);
+    setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
+  };
 
   return (
     <div>

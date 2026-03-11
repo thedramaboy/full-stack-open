@@ -59,7 +59,7 @@ blogsRouter.delete("/:id", async (request, response, next) => {
 });
 
 blogsRouter.put("/:id", async (request, response, next) => {
-  const { title, author, url, likes } = request.body;
+  const { title, author, url, likes, user } = request.body;
 
   const blog = await Blog.findById(request.params.id);
   if (!blog) {
@@ -70,9 +70,12 @@ blogsRouter.put("/:id", async (request, response, next) => {
   blog.author = author;
   blog.url = url;
   blog.likes = likes;
+  blog.user = user;
 
   try {
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog);
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
+      returnDocument: "after",
+    }).populate("user", { username: 1, name: 1 });
     return response.json(updatedBlog);
   } catch (error) {
     next(error);
