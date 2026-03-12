@@ -69,13 +69,22 @@ const App = () => {
     setBlogs(blogs.concat(blogAdded));
   };
 
-  const blogDescription = () => (
-    <div>
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} updateLike={updateBlog}/>
-      ))}
-    </div>
-  );
+  const blogDescription = () => {
+    const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
+
+    return (
+      <div>
+        {sortedBlogs.map((blog) => (
+          <Blog
+            key={blog.id}
+            blog={blog}
+            updateLike={updateBlog}
+            deleteBlog={deleteBlog}
+          />
+        ))}
+      </div>
+    );
+  };
 
   const blogForm = () => (
     <Togglable buttonLabel="create new blog" ref={blogFormRef}>
@@ -86,6 +95,11 @@ const App = () => {
   const updateBlog = async (id, blogObject) => {
     const updatedBlog = await blogService.update(id, blogObject);
     setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
+  };
+
+  const deleteBlog = async (id) => {
+    await blogService.deleteBlog(id);
+    setBlogs(blogs.filter((blog) => blog.id !== id));
   };
 
   return (
