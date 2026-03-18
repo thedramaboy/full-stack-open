@@ -47,8 +47,9 @@ describe("Blog app", () => {
     });
 
     test("a new blog can be created", async ({ page }) => {
-      await createBlog(page, "Test title", "Test author", "Test url");
-      await expect(page.getByText("Test title")).toBeVisible();
+      const title = "Test title";
+      await createBlog(page, title, "Test author", "Test url");
+      await expect(page.getByText("Test title Test author")).toBeVisible();
     });
 
     test("the blog can be liked", async ({ page }) => {
