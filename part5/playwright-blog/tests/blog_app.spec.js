@@ -11,6 +11,13 @@ describe("Blog app", () => {
         password: "DomeZa",
       },
     });
+    await request.post("/api/users", {
+      data: {
+        name: "User Test",
+        username: "test",
+        password: "test",
+      },
+    });
     await page.goto("/");
   });
 
@@ -72,6 +79,19 @@ describe("Blog app", () => {
       await page.getByRole("button", { name: "remove" }).click();
       const blogElement = page.locator(".blog").filter({ hasText: title });
       await expect(blogElement).not.toBeVisible();
+    });
+
+    test("only the user who added the blog sees the blog's delete button", async ({
+      page,
+    }) => {
+      const title = "Test title";
+      await createBlog(page, title, "Test author", "Test url");
+      await page.getByRole("button", { name: "logout" }).click();
+      await loginWith(page, "test", "test");
+      const blogElement = page.locator(".blog").filter({ hasText: title });
+      await blogElement.getByRole("button", { name: "view" }).click();
+      const removeButton = blogElement.getByRole("button", { name: "remove" });
+      await expect(removeButton).not.toBeVisible();
     });
   });
 });
