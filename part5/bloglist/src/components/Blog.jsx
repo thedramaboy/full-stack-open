@@ -21,7 +21,7 @@ const Blog = ({ blog, updateLike, deleteBlog, user }) => {
       likes: blog.likes + 1,
       user: blog.user?.id,
     };
-
+    console.log(updatedObject);
     updateLike(blog.id, updatedObject);
   };
 
@@ -47,7 +47,7 @@ const Blog = ({ blog, updateLike, deleteBlog, user }) => {
             likes {blog.likes} <button onClick={handleLikeUpdate}>like</button>
           </p>
           <p>{blog.user?.name}</p>
-          {blog.user && user.id && (
+          {blog.user === user.id && (
             <button onClick={handleDelete}>remove</button>
           )}
         </div>

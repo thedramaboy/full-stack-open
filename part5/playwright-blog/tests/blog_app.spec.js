@@ -93,5 +93,29 @@ describe("Blog app", () => {
       const removeButton = blogElement.getByRole("button", { name: "remove" });
       await expect(removeButton).not.toBeVisible();
     });
+
+    test("the blogs are arranged in the order according to the likes", async ({
+      page,
+    }) => {
+      await createBlog(page, "Test first", "Test author 1", "Test url 1");
+      await createBlog(page, "Test second", "Test author 2", "Test url 2");
+      const firstBlog = page.locator(".blog").filter({ hasText: "Test first" });
+      const secondBlog = page
+        .locator(".blog")
+        .filter({ hasText: "Test second" });
+      // await firstBlog.getByRole("button", { name: "view" }).click();
+      // await expect(firstBlog.getByText("likes 0")).toBeVisible();
+      // await firstBlog.getByRole("button", { name: "hide" }).click();
+      await secondBlog.getByRole("button", { name: "view" }).click();
+      // await expect(secondBlog.getByText("likes 0")).toBeVisible();
+      // await secondBlog.getByRole("button", { name: "hide" }).click();
+      await secondBlog.getByRole("button", { name: "like" }).click();
+      await secondBlog.getByRole("button", { name: "like" }).click();
+      await secondBlog.getByRole("button", { name: "like" }).click();
+      // await expect(secondBlog.getByText("likes 3")).toBeVisible();
+
+      const blogLocator = page.locator(".blog");
+      await expect(blogLocator.nth(0)).toContainText("Test second");
+    });
   });
 });
