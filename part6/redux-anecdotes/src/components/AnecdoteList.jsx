@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from "react-redux";
-import { toggleVote } from "../reducers/anecdoteReducer";
+import { voteToggle } from "../reducers/anecdoteReducer";
 import {
   clearNotification,
   setNotification,
@@ -18,7 +18,7 @@ const AnecdoteList = () => {
   const sortedContents = [...anecdotes].sort((a, b) => b.votes - a.votes);
 
   const handleVote = (anecdote) => {
-    dispatch(toggleVote(anecdote.id));
+    dispatch(voteToggle(anecdote));
     dispatch(setNotification(`You voted ${anecdote.content}`));
     setTimeout(() => {
       dispatch(clearNotification());
