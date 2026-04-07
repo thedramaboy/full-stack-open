@@ -1,4 +1,6 @@
-const LoginForm = ({
+import Togglable from "./Togglable";
+
+const Login = ({
   handleLogin,
   username,
   password,
@@ -27,4 +29,4 @@ const LoginForm = ({
   </form>
 );
 
-export default LoginForm;
+export default Login;
