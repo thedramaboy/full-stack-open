@@ -4,7 +4,13 @@ import loginService from "./services/login";
 import Notification from "./components/Notification";
 import Togglable from "./components/Togglable";
 import BlogForm from "./components/BlogForm";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+} from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
 
@@ -15,6 +21,7 @@ const App = () => {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState({ text: null, type: null });
   const blogFormRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -36,6 +43,7 @@ const App = () => {
       window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
       blogService.setToken(user.token);
       setUser(user);
+      navigate("/");
       setUsername("");
       setPassword("");
     } catch {
@@ -88,40 +96,42 @@ const App = () => {
     <div>
       <Notification message={message} />
       <div>
-        <Router>
-          <div>
-            <Link style={{ padding: 10 }} to="/">
-              blogs
-            </Link>
-            {!user ? <Link to="/login">login</Link> : <button onClick={handleLogout}>logout</button>}
-          </div>
-          <h2>blogs</h2>
-          <Routes>
-            <Route path="/" element={<Home blogs={blogs} />} />
-            <Route
-              path="login"
-              element={
-                <Login
-                  handleLogin={handleLogin}
-                  username={username}
-                  password={password}
-                  handleUsernameChange={({ target }) =>
-                    setUsername(target.value)
-                  }
-                  handlePasswordChange={({ target }) =>
-                    setPassword(target.value)
-                  }
-                />
-              }
-            />
-          </Routes>
-        </Router>
-        {/* <p>
-          {user.name} is logged in
-          <button onClick={handleLogout}>logout</button>
-        </p> */}
-        {/* {blogForm()} */}
-        {/* {blogDescription()} */}
+        <div>
+          <Link style={{ padding: 10 }} to="/">
+            blogs
+          </Link>
+          {!user ? (
+            <Link to="login">login</Link>
+          ) : (
+            <button onClick={handleLogout}>logout</button>
+          )}
+        </div>
+        <h2>blogs</h2>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                blogs={blogs}
+                user={user}
+                updateBlog={updateBlog}
+                deleteBlog={deleteBlog}
+              />
+            }
+          />
+          <Route
+            path="login"
+            element={
+              <Login
+                handleLogin={handleLogin}
+                username={username}
+                password={password}
+                handleUsernameChange={({ target }) => setUsername(target.value)}
+                handlePasswordChange={({ target }) => setPassword(target.value)}
+              />
+            }
+          />
+        </Routes>
       </div>
     </div>
   );
