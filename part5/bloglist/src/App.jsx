@@ -2,17 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
 import BlogForm from "./components/BlogForm";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-} from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import BlogDetails from "./components/BlogDetails";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -76,12 +70,6 @@ const App = () => {
     }
   };
 
-  const blogForm = () => (
-    <Togglable buttonLabel="create new blog" ref={blogFormRef}>
-      <BlogForm createBlog={addBlog} />
-    </Togglable>
-  );
-
   const updateBlog = async (id, blogObject) => {
     const updatedBlog = await blogService.update(id, blogObject);
     setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
@@ -101,12 +89,16 @@ const App = () => {
             blogs
           </Link>
           {!user ? (
-            <Link to="login">login</Link>
+            <Link to="/login">login</Link>
           ) : (
-            <button onClick={handleLogout}>logout</button>
+            <span>
+              <Link style={{ padding: 10 }} to={"/newBlog"}>
+                new blog
+              </Link>
+              <button onClick={handleLogout}>logout</button>
+            </span>
           )}
         </div>
-        <h2>blogs</h2>
         <Routes>
           <Route
             path="/"
@@ -120,7 +112,7 @@ const App = () => {
             }
           />
           <Route
-            path="login"
+            path="/login"
             element={
               <Login
                 handleLogin={handleLogin}
@@ -131,6 +123,18 @@ const App = () => {
               />
             }
           />
+          <Route
+            path="/blogs/:id"
+            element={
+              <BlogDetails
+                blogs={blogs}
+                user={user}
+                updateLike={updateBlog}
+                deleteBlog={deleteBlog}
+              />
+            }
+          />
+          <Route path="/newBlog" element={<BlogForm createBlog={addBlog} />}/>
         </Routes>
       </div>
     </div>

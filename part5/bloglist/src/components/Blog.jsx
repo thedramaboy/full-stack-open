@@ -1,57 +1,21 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 
-const Blog = ({ blog, updateLike, deleteBlog, user }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
-  const [visible, setVisible] = useState(false);
-
-  const handleToggle = () => {
-    return setVisible(!visible);
-  };
-
-  const handleLikeUpdate = () => {
-    const updatedObject = {
-      ...blog,
-      likes: blog.likes + 1,
-      user: blog.user?.id,
-    };
-    console.log(updatedObject);
-    updateLike(blog.id, updatedObject);
-  };
-
-  const handleDelete = () => {
-    const result = window.confirm(
-      `Remove blog ${blog.title} by ${blog.author}`,
-    );
-    if (result) {
-      deleteBlog(blog.id);
-    }
-  };
+const Blog = ({ blog }) => {
+  // const blogStyle = {
+  //   paddingTop: 10,
+  //   paddingLeft: 2,
+  //   border: "solid",
+  //   borderWidth: 1,
+  //   marginBottom: 5,
+  // };
 
   return (
-    <div style={blogStyle} className="blog">
-      <div>
-        {blog.title} {blog.author}
-        <button onClick={handleToggle}>{visible ? "hide" : "view"}</button>
-      </div>
-      {visible && (
-        <div>
-          <p>{blog.url}</p>
-          <p>
-            likes {blog.likes} <button onClick={handleLikeUpdate}>like</button>
-          </p>
-          <p>{blog.user?.name}</p>
-          {blog.user === user.id && (
-            <button onClick={handleDelete}>remove</button>
-          )}
-        </div>
-      )}
+    <div className="blog">
+      <ul>
+        <li>
+          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+        </li>
+      </ul>
     </div>
   );
 };

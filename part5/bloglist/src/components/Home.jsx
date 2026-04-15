@@ -5,6 +5,7 @@ const Home = ({ blogs, user, updateBlog, deleteBlog }) => {
 
   return (
     <div>
+      <h2>blogs</h2>
       {sortedBlogs.map((blog) => (
         <Blog
           key={blog.id}
