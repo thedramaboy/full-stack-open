@@ -31,7 +31,9 @@ const BlogDetails = ({ blogs, user, updateLike, deleteBlog }) => {
       <h2>{blog.title}</h2>
       <a href={blog.url}>{blog.url}</a>
       <p>
-        likes {blog.likes} <button onClick={handleLikeUpdate}>like</button>
+        likes {blog.likes}{" "}
+        {user && <button onClick={handleLikeUpdate}>like</button>}
+        condition
       </p>
       <p>Added by {blog.user?.name}</p>
       {user && blog.user?.id === user.id && (
