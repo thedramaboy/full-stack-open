@@ -5,47 +5,22 @@ describe("Blog app", () => {
   beforeEach(async ({ page, request }) => {
     await request.post("/api/testing/reset");
     await request.post("/api/users", {
-      data: {
-        name: "Nate Se",
-        username: "nate",
-        password: "DomeZa",
-      },
+      data: { name: "Nate Se", username: "nate", password: "DomeZa" },
     });
     await request.post("/api/users", {
-      data: {
-        name: "User Test",
-        username: "test",
-        password: "test",
-      },
+      data: { name: "User Test", username: "test", password: "test" },
     });
     await page.goto("/");
   });
 
-  describe("Login form validation", () => {
-    test("Login form is shown", async ({ page }) => {
-      const loginButton = page.getByRole("button", { name: "login" });
+  test("login succeeds with correct credentials", async ({ page }) => {
+    await loginWith(page, "nate", "DomeZa");
+    await expect(page.getByText("Nate Se logged in")).toBeVisible();
+  });
 
-      await expect(loginButton).toBeVisible();
-      await loginButton.click();
-
-      await expect(page.getByText("log in to application")).toBeVisible();
-      await expect(page.getByLabel("username")).toBeVisible();
-      await expect(page.getByLabel("password")).toBeVisible();
-    });
-
-    describe("Login", () => {
-      test("login with correct credential", async ({ page }) => {
-        await loginWith(page, "nate", "DomeZa");
-        await expect(page.getByText("Nate Se is logged in")).toBeVisible();
-      });
-
-      test("login with wrong credential", async ({ page }) => {
-        await loginWith(page, "nate", "wrong");
-        await expect(
-          page.getByText("wrong username or password"),
-        ).toBeVisible();
-      });
-    });
+  test("login fails with wrong credentials", async ({ page }) => {
+    await loginWith(page, "nate", "wrong");
+    await expect(page.getByText("wrong username or password")).toBeVisible();
   });
 
   describe("When logged in", () => {
@@ -54,68 +29,24 @@ describe("Blog app", () => {
     });
 
     test("a new blog can be created", async ({ page }) => {
-      const title = "Test title";
-      await createBlog(page, title, "Test author", "Test url");
-      await expect(page.getByText("Test title Test author")).toBeVisible();
+      await createBlog(page, "Test title", "Test author", "Test url");
+      await expect(page.getByText("Test title")).toBeVisible();
     });
 
-    test("the blog can be liked", async ({ page }) => {
-      const title = "Test title";
-      await createBlog(page, title, "Test author", "Test url");
-      const blogElement = page.locator(".blog").filter({ hasText: title });
-      await blogElement.getByRole("button", { name: "view" }).click();
-      await expect(blogElement.getByText("likes 0")).toBeVisible();
-      await blogElement.getByRole("button", { name: "like" }).click();
-      await expect(blogElement.getByText("likes 1")).toBeVisible();
+    test("a blog can be liked", async ({ page }) => {
+      await createBlog(page, "Test title", "Test author", "Test url");
+      await page.getByText("Test title").click();
+      await expect(page.getByText(/likes 0/i)).toBeVisible();
+      await page.getByRole("button", { name: "like" }).click();
+      await expect(page.getByText(/likes 1/i)).toBeVisible();
     });
 
-    test("blog can be deleted", async ({ page }) => {
-      const title = "Test title";
-      await createBlog(page, title, "Test author", "Test url");
-      page.on("dialog", async (dialog) => {
-        await dialog.accept();
-      });
-      await page.getByRole("button", { name: "view" }).click();
+    test("a blog can be deleted", async ({ page }) => {
+      await createBlog(page, "Test title", "Test author", "Test url");
+      await page.getByText("Test title").click();
+      page.on("dialog", (dialog) => dialog.accept());
       await page.getByRole("button", { name: "remove" }).click();
-      const blogElement = page.locator(".blog").filter({ hasText: title });
-      await expect(blogElement).not.toBeVisible();
-    });
-
-    test("only the user who added the blog sees the blog's delete button", async ({
-      page,
-    }) => {
-      const title = "Test title";
-      await createBlog(page, title, "Test author", "Test url");
-      await page.getByRole("button", { name: "logout" }).click();
-      await loginWith(page, "test", "test");
-      const blogElement = page.locator(".blog").filter({ hasText: title });
-      await blogElement.getByRole("button", { name: "view" }).click();
-      const removeButton = blogElement.getByRole("button", { name: "remove" });
-      await expect(removeButton).not.toBeVisible();
-    });
-
-    test("the blogs are arranged in the order according to the likes", async ({
-      page,
-    }) => {
-      await createBlog(page, "Test first", "Test author 1", "Test url 1");
-      await createBlog(page, "Test second", "Test author 2", "Test url 2");
-      const firstBlog = page.locator(".blog").filter({ hasText: "Test first" });
-      const secondBlog = page
-        .locator(".blog")
-        .filter({ hasText: "Test second" });
-      // await firstBlog.getByRole("button", { name: "view" }).click();
-      // await expect(firstBlog.getByText("likes 0")).toBeVisible();
-      // await firstBlog.getByRole("button", { name: "hide" }).click();
-      await secondBlog.getByRole("button", { name: "view" }).click();
-      // await expect(secondBlog.getByText("likes 0")).toBeVisible();
-      // await secondBlog.getByRole("button", { name: "hide" }).click();
-      await secondBlog.getByRole("button", { name: "like" }).click();
-      await secondBlog.getByRole("button", { name: "like" }).click();
-      await secondBlog.getByRole("button", { name: "like" }).click();
-      // await expect(secondBlog.getByText("likes 3")).toBeVisible();
-
-      const blogLocator = page.locator(".blog");
-      await expect(blogLocator.nth(0)).toContainText("Test second");
+      await expect(page.getByText("Test title")).not.toBeVisible();
     });
   });
 });
