@@ -7,6 +7,7 @@ import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import BlogDetails from "./components/BlogDetails";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -99,46 +100,64 @@ const App = () => {
             </span>
           )}
         </div>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Home
-                blogs={blogs}
-                user={user}
-                updateBlog={updateBlog}
-                deleteBlog={deleteBlog}
-              />
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Login
-                handleLogin={handleLogin}
-                username={username}
-                password={password}
-                handleUsernameChange={({ target }) => setUsername(target.value)}
-                handlePasswordChange={({ target }) => setPassword(target.value)}
-              />
-            }
-          />
-          <Route
-            path="/blogs/:id"
-            element={
-              <BlogDetails
-                blogs={blogs}
-                user={user}
-                updateLike={updateBlog}
-                deleteBlog={deleteBlog}
-              />
-            }
-          />
-          <Route path="/newBlog" element={<BlogForm createBlog={addBlog} />}/>
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Home
+                  blogs={blogs}
+                  user={user}
+                  updateBlog={updateBlog}
+                  deleteBlog={deleteBlog}
+                />
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Login
+                  handleLogin={handleLogin}
+                  username={username}
+                  password={password}
+                  handleUsernameChange={({ target }) =>
+                    setUsername(target.value)
+                  }
+                  handlePasswordChange={({ target }) =>
+                    setPassword(target.value)
+                  }
+                />
+              }
+            />
+            <Route
+              path="/blogs/:id"
+              element={
+                <BlogDetails
+                  blogs={blogs}
+                  user={user}
+                  updateLike={updateBlog}
+                  deleteBlog={deleteBlog}
+                />
+              }
+            />
+            <Route
+              path="/newBlog"
+              element={<BlogForm createBlog={addBlog} />}
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
       </div>
     </div>
   );
 };
 
 export default App;
+
+const NotFound = () => (
+  <div>
+    <h2>404 - Page not found</h2>
+    <p>the page you are looking for does not exist.</p>
+    <Link to="/">go back to home</Link>
+  </div>
+);

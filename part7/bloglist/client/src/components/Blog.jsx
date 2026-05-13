@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 const Blog = ({ blog }) => {
+  // throw new Error("simulated error");
   // const blogStyle = {
   //   paddingTop: 10,
   //   paddingLeft: 2,
