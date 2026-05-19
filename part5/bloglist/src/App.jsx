@@ -7,6 +7,7 @@ import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import BlogDetails from "./components/BlogDetails";
+import { Container } from "@mui/material";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -81,63 +82,72 @@ const App = () => {
   };
 
   return (
-    <div>
-      <Notification message={message} />
+    <Container>
       <div>
+        <Notification message={message} />
         <div>
-          <Link style={{ padding: 10 }} to="/">
-            blogs
-          </Link>
-          {!user ? (
-            <Link to="/login">login</Link>
-          ) : (
-            <span>
-              <Link style={{ padding: 10 }} to={"/newBlog"}>
-                new blog
-              </Link>
-              <button onClick={handleLogout}>logout</button>
-            </span>
-          )}
+          <div>
+            <Link style={{ padding: 10 }} to="/">
+              blogs
+            </Link>
+            {!user ? (
+              <Link to="/login">login</Link>
+            ) : (
+              <span>
+                <Link style={{ padding: 10 }} to={"/newBlog"}>
+                  new blog
+                </Link>
+                <button onClick={handleLogout}>logout</button>
+              </span>
+            )}
+          </div>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Home
+                  blogs={blogs}
+                  user={user}
+                  updateBlog={updateBlog}
+                  deleteBlog={deleteBlog}
+                />
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                <Login
+                  handleLogin={handleLogin}
+                  username={username}
+                  password={password}
+                  handleUsernameChange={({ target }) =>
+                    setUsername(target.value)
+                  }
+                  handlePasswordChange={({ target }) =>
+                    setPassword(target.value)
+                  }
+                />
+              }
+            />
+            <Route
+              path="/blogs/:id"
+              element={
+                <BlogDetails
+                  blogs={blogs}
+                  user={user}
+                  updateLike={updateBlog}
+                  deleteBlog={deleteBlog}
+                />
+              }
+            />
+            <Route
+              path="/newBlog"
+              element={<BlogForm createBlog={addBlog} />}
+            />
+          </Routes>
         </div>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Home
-                blogs={blogs}
-                user={user}
-                updateBlog={updateBlog}
-                deleteBlog={deleteBlog}
-              />
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              <Login
-                handleLogin={handleLogin}
-                username={username}
-                password={password}
-                handleUsernameChange={({ target }) => setUsername(target.value)}
-                handlePasswordChange={({ target }) => setPassword(target.value)}
-              />
-            }
-          />
-          <Route
-            path="/blogs/:id"
-            element={
-              <BlogDetails
-                blogs={blogs}
-                user={user}
-                updateLike={updateBlog}
-                deleteBlog={deleteBlog}
-              />
-            }
-          />
-          <Route path="/newBlog" element={<BlogForm createBlog={addBlog} />}/>
-        </Routes>
       </div>
-    </div>
+    </Container>
   );
 };
 

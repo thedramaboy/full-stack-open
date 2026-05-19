@@ -7,6 +7,7 @@ import loginService from "./services/login";
 import LoginForm from "./components/LoginForm";
 import NoteForm from "./components/NoteForm";
 import Togglable from "./components/Togglable";
+import { Container } from "@mui/material";
 
 const App = () => {
   const [notes, setNotes] = useState(null);
@@ -108,34 +109,36 @@ const App = () => {
   );
 
   return (
-    <div>
-      <h1>Notes</h1>
-      <Notification message={errorMessage} />
-
-      {!user && loginForm()}
-      {user && (
-        <div>
-          <p>{user.name} logged in</p>
-          {noteForm()}
-        </div>
-      )}
-
+    <Container>
       <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          Show {showAll ? "important" : "all"}
-        </button>
+        <h1>Notes</h1>
+        <Notification message={errorMessage} />
+
+        {!user && loginForm()}
+        {user && (
+          <div>
+            <p>{user.name} logged in</p>
+            {noteForm()}
+          </div>
+        )}
+
+        <div>
+          <button onClick={() => setShowAll(!showAll)}>
+            Show {showAll ? "important" : "all"}
+          </button>
+        </div>
+        <ul>
+          {notesToShow.map((note) => (
+            <Note
+              key={note.id}
+              note={note}
+              toggleImportance={() => toggleImportanceOf(note.id)}
+            />
+          ))}
+        </ul>
+        <Footer />
       </div>
-      <ul>
-        {notesToShow.map((note) => (
-          <Note
-            key={note.id}
-            note={note}
-            toggleImportance={() => toggleImportanceOf(note.id)}
-          />
-        ))}
-      </ul>
-      <Footer />
-    </div>
+    </Container>
   );
 };
 export default App;
