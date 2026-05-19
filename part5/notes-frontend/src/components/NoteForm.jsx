@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button } from "@mui/material";
+import { TextField } from "@mui/material";
+import styled from "styled-components";
 
 const NoteForm = ({ createNote }) => {
   const [newNote, setNewNote] = useState("");
@@ -26,8 +27,8 @@ const NoteForm = ({ createNote }) => {
           value={newNote}
           onChange={event => setNewNote(event.target.value)}
           placeholder="write note content here"
-        />
-        <button type="submit">save</button> */}
+        /> */}
+        {/* <button type="submit">save</button> */}
         <TextField
           label="note content"
           value={newNote}
@@ -44,3 +45,17 @@ const NoteForm = ({ createNote }) => {
 };
 
 export default NoteForm;
+
+const Button = styled.button`
+  background: Bisque;
+  font-size: 1em;
+  margin: 1em;
+  padding: 0.25em 1em;
+  border: 2px solid Chocolate;
+  border-radius: 3px;
+`;
+
+const Input = styled.input`
+  margin: 0.25em;
+  width: 300px;
+`;
