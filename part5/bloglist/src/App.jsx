@@ -7,14 +7,15 @@ import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import BlogDetails from "./components/BlogDetails";
-import { Container } from "@mui/material";
+import { AppBar, Box, Button, Container, Toolbar } from "@mui/material";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [message, setMessage] = useState({ text: null, type: null });
+  // const [message, setMessage] = useState({ text: null, type: null });
+  const [notification, setNotification] = useState(null);
   const blogFormRef = useRef();
   const navigate = useNavigate();
 
@@ -42,9 +43,9 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch {
-      setMessage({ text: "wrong username or password", type: "error" });
+      setNotification({ text: "wrong username or password", type: "error" });
       setTimeout(() => {
-        setMessage({ text: null, type: null });
+        setNotification(null);
       }, 5000);
     }
   };
@@ -58,16 +59,17 @@ const App = () => {
     try {
       const blogAdded = await blogService.create(blogObject);
       setBlogs(blogs.concat(blogAdded));
-      blogFormRef.current.toggleVisibility();
-      setMessage({
-        text: `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
+      // blogFormRef.current.toggleVisibility();
+      console.log(blogAdded)
+      setNotification({
+        text: `Note '${blogAdded.title}' added!`,
         type: "success",
       });
-      setTimeout(() => setMessage({ text: null, type: null }), 5000);
+      setTimeout(() => setNotification(null), 5000);
     } catch (error) {
       console.error("Error creating blog:", error);
-      setMessage({ text: "failed to create blog", type: "error" });
-      setTimeout(() => setMessage({ text: null, type: null }), 5000);
+      setNotification({ text: "failed to create blog", type: "error" });
+      setTimeout(() => setNotification(null), 5000);
     }
   };
 
@@ -84,9 +86,8 @@ const App = () => {
   return (
     <Container>
       <div>
-        <Notification message={message} />
         <div>
-          <div>
+          {/* <div>
             <Link style={{ padding: 10 }} to="/">
               blogs
             </Link>
@@ -100,7 +101,32 @@ const App = () => {
                 <button onClick={handleLogout}>logout</button>
               </span>
             )}
-          </div>
+          </div> */}
+          <AppBar position="static">
+            <Toolbar>
+              <h1>Blog App</h1>
+              <Box sx={{ marginLeft: "auto" }}>
+                <Button color="inherit" component={Link} to="/">
+                  BLOGS
+                </Button>
+                {!user ? (
+                  <Button color="inherit" component={Link} to="/login">
+                    LOGIN
+                  </Button>
+                ) : (
+                  <span>
+                    <Button color="inherit" component={Link} to="/newBlog">
+                      NEW BLOG
+                    </Button>
+                    <Button color="inherit" onClick={handleLogout}>
+                      LOGOUT
+                    </Button>
+                  </span>
+                )}
+              </Box>
+            </Toolbar>
+          </AppBar>
+          <Notification notification={notification} />
           <Routes>
             <Route
               path="/"
