@@ -8,18 +8,27 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import BlogDetails from "./components/BlogDetails";
 import ErrorBoundary from "./components/ErrorBoundary";
+import useNotificationStore from "./stores/notificationStore";
+import useBlogStore from "./stores/blogStore";
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  // const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [message, setMessage] = useState({ text: null, type: null });
-  const blogFormRef = useRef();
+  // const [message, setMessage] = useState({ text: null, type: null });
+  // const blogFormRef = useRef();
   const navigate = useNavigate();
+  const setNotification = useNotificationStore(
+    (state) => state.setNotification,
+  );
+  const initializeBlogs = useBlogStore((state) => state.initializeBlogs);
+  const createBlog = useBlogStore((state) => state.addBlog);
+  const blogs = useBlogStore((state) => state.blogs);
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    // blogService.getAll().then((blogs) => setBlogs(blogs));
+    initializeBlogs();
   }, []);
 
   useEffect(() => {
@@ -42,10 +51,7 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch {
-      setMessage({ text: "wrong username or password", type: "error" });
-      setTimeout(() => {
-        setMessage({ text: null, type: null });
-      }, 5000);
+      setNotification("wrong username or password", "error");
     }
   };
 
@@ -56,18 +62,17 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     try {
-      const blogAdded = await blogService.create(blogObject);
-      setBlogs(blogs.concat(blogAdded));
-      blogFormRef.current.toggleVisibility();
-      setMessage({
-        text: `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
-        type: "success",
-      });
-      setTimeout(() => setMessage({ text: null, type: null }), 5000);
+      // const blogAdded = await blogService.create(blogObject);
+      // setBlogs(blogs.concat(blogAdded));
+      const blogAdded = await createBlog(blogObject);
+      // blogFormRef.current.toggleVisibility();
+      setNotification(
+        `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
+        "success",
+      );
     } catch (error) {
       console.error("Error creating blog:", error);
-      setMessage({ text: "failed to create blog", type: "error" });
-      setTimeout(() => setMessage({ text: null, type: null }), 5000);
+      setNotification("failed to create blog", "error");
     }
   };
 
@@ -83,7 +88,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={message} />
+      <Notification />
       <div>
         <div>
           <Link style={{ padding: 10 }} to="/">
