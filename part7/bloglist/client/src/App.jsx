@@ -15,6 +15,7 @@ import {
   useNotificationDispatch,
   setNotification,
 } from "./context/NotificationContext";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const App = () => {
   // const [blogs, setBlogs] = useState([]);
@@ -36,6 +37,27 @@ const App = () => {
   const setUser = useUserStore((state) => state.setUser);
   const clearUser = useUserStore((state) => state.clearUser);
   const dispatch = useNotificationDispatch();
+  const queryClient = useQueryClient();
+
+  const { data: blogs = [] } = useQuery({
+    queryKey: ["blogs"],
+    queryFn: () => blogService.getAll(),
+  });
+
+  const createBlogMutation = useMutation({
+    mutationFn: (blogObject) => blogObject.create(blogObject),
+    onSuccess: (newBlog) => {
+      queryClient.invalidateQueries({ queryKey: ["blogs"] });
+      setNotification(
+        dispatch,
+        `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
+        "success",
+      );
+    },
+    onError: () => {
+      etNotification(dispatch, "failed to create blog", "error");
+    },
+  });
 
   useEffect(() => {
     // blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -75,13 +97,14 @@ const App = () => {
     try {
       // const blogAdded = await blogService.create(blogObject);
       // setBlogs(blogs.concat(blogAdded));
-      const blogAdded = await createBlog(blogObject);
+      // const blogAdded = await createBlog(blogObject);
       // blogFormRef.current.toggleVisibility();
-      setNotification(
-        dispatch,
-        `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
-        "success",
-      );
+      // setNotification(
+      //   dispatch,
+      //   `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
+      //   "success",
+      // );
+      createBlogMutation.mutate(blogObject);
     } catch (error) {
       console.error("Error creating blog:", error);
       setNotification(dispatch, "failed to create blog", "error");
