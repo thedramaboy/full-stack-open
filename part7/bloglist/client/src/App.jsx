@@ -10,12 +10,13 @@ import BlogDetails from "./components/BlogDetails";
 import ErrorBoundary from "./components/ErrorBoundary";
 import useNotificationStore from "./stores/notificationStore";
 import useBlogStore from "./stores/blogStore";
+import useUserStore from "./stores/userStore";
 
 const App = () => {
   // const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   // const [message, setMessage] = useState({ text: null, type: null });
   // const blogFormRef = useRef();
   const navigate = useNavigate();
@@ -26,7 +27,11 @@ const App = () => {
   const createBlog = useBlogStore((state) => state.addBlog);
   const blogs = useBlogStore((state) => state.blogs);
   const deleteBlog = useBlogStore((state) => state.deleteBlog)
-
+  const updateBlog = useBlogStore((state) => state.updateBlog)
+  const user = useUserStore((state) => state.user)
+  const setUser = useUserStore((state) => state.setUser)
+  const clearUser = useUserStore((state) => state.clearUser)
+  
   useEffect(() => {
     // blogService.getAll().then((blogs) => setBlogs(blogs));
     initializeBlogs();
@@ -58,7 +63,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedBlogAppUser");
-    setUser(null);
+    clearUser()
   };
 
   const addBlog = async (blogObject) => {
@@ -77,10 +82,10 @@ const App = () => {
     }
   };
 
-  const updateBlog = async (id, blogObject) => {
-    const updatedBlog = await blogService.update(id, blogObject);
-    setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
-  };
+  // const updateBlog = async (id, blogObject) => {
+  //   const updatedBlog = await blogService.update(id, blogObject);
+  //   setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
+  // };
 
   // const deleteBlog = async (id) => {
   //   await blogService.deleteBlog(id);

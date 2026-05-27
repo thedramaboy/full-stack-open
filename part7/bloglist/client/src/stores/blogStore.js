@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import blogService from "../services/blogs.js";
-import blogs from "../services/blogs.js";
 
 const useBlogStore = create((set) => ({
   blogs: [],
