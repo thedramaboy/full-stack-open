@@ -1,7 +1,9 @@
-import useNotificationStore from "../stores/notificationStore";
+// import useNotificationStore from "../stores/notificationStore";
+import { useNotification } from "../context/NotificationContext";
 
 const Notification = ({ message }) => {
-  const notification = useNotificationStore((state) => state.notification);
+  // const notification = useNotificationStore((state) => state.notification);
+  const notification = useNotification();
 
   // const messageStyle = {
   //   color: "green",

@@ -11,6 +11,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import useNotificationStore from "./stores/notificationStore";
 import useBlogStore from "./stores/blogStore";
 import useUserStore from "./stores/userStore";
+import {
+  useNotificationDispatch,
+  setNotification,
+} from "./context/NotificationContext";
 
 const App = () => {
   // const [blogs, setBlogs] = useState([]);
@@ -20,18 +24,19 @@ const App = () => {
   // const [message, setMessage] = useState({ text: null, type: null });
   // const blogFormRef = useRef();
   const navigate = useNavigate();
-  const setNotification = useNotificationStore(
-    (state) => state.setNotification,
-  );
+  // const setNotification = useNotificationStore(
+  //   (state) => state.setNotification,
+  // );
   const initializeBlogs = useBlogStore((state) => state.initializeBlogs);
   const createBlog = useBlogStore((state) => state.addBlog);
   const blogs = useBlogStore((state) => state.blogs);
-  const deleteBlog = useBlogStore((state) => state.deleteBlog)
-  const updateBlog = useBlogStore((state) => state.updateBlog)
-  const user = useUserStore((state) => state.user)
-  const setUser = useUserStore((state) => state.setUser)
-  const clearUser = useUserStore((state) => state.clearUser)
-  
+  const deleteBlog = useBlogStore((state) => state.deleteBlog);
+  const updateBlog = useBlogStore((state) => state.updateBlog);
+  const user = useUserStore((state) => state.user);
+  const setUser = useUserStore((state) => state.setUser);
+  const clearUser = useUserStore((state) => state.clearUser);
+  const dispatch = useNotificationDispatch();
+
   useEffect(() => {
     // blogService.getAll().then((blogs) => setBlogs(blogs));
     initializeBlogs();
@@ -57,13 +62,13 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch {
-      setNotification("wrong username or password", "error");
+      setNotification(dispatch, "wrong username or password", "error");
     }
   };
 
   const handleLogout = () => {
     window.localStorage.removeItem("loggedBlogAppUser");
-    clearUser()
+    clearUser();
   };
 
   const addBlog = async (blogObject) => {
@@ -73,12 +78,13 @@ const App = () => {
       const blogAdded = await createBlog(blogObject);
       // blogFormRef.current.toggleVisibility();
       setNotification(
+        dispatch,
         `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
         "success",
       );
     } catch (error) {
       console.error("Error creating blog:", error);
-      setNotification("failed to create blog", "error");
+      setNotification(dispatch, "failed to create blog", "error");
     }
   };
 
