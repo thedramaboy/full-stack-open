@@ -25,6 +25,7 @@ const App = () => {
   const initializeBlogs = useBlogStore((state) => state.initializeBlogs);
   const createBlog = useBlogStore((state) => state.addBlog);
   const blogs = useBlogStore((state) => state.blogs);
+  const deleteBlog = useBlogStore((state) => state.deleteBlog)
 
   useEffect(() => {
     // blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -81,10 +82,10 @@ const App = () => {
     setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
   };
 
-  const deleteBlog = async (id) => {
-    await blogService.deleteBlog(id);
-    setBlogs(blogs.filter((blog) => blog.id !== id));
-  };
+  // const deleteBlog = async (id) => {
+  //   await blogService.deleteBlog(id);
+  //   setBlogs(blogs.filter((blog) => blog.id !== id));
+  // };
 
   return (
     <div>

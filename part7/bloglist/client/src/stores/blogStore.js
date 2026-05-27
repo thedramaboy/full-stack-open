@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import blogService from "../services/blogs.js";
+import blogs from "../services/blogs.js";
 
 const useBlogStore = create((set) => ({
   blogs: [],
@@ -14,6 +15,18 @@ const useBlogStore = create((set) => ({
     }));
     return newBlog;
   },
+  deleteBlog: async (id) => {
+    await blogService.deleteBlog(id);
+    set((state) => ({
+      blogs: state.blogs.filter((blog) => blog.id !== id)
+    }))
+  },
+  updateBlog: async (id, blogObject) => {
+    const updatedBlog = await blogService.update(id, blogObject)
+    set((state) => ({
+      blogs: state.blogs.map((blog) => (blog.id !== id ? blog : updatedBlog))
+    }))
+  }
 }));
 
 export default useBlogStore;
