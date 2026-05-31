@@ -1,10 +1,8 @@
 import { useState } from "react";
 import useField from "../hooks/useField";
+import { TextField, Button } from "@mui/material";
 
 const BlogForm = ({ createBlog }) => {
-  // const [title, setTitle] = useState("");
-  // const [author, setAuthor] = useState("");
-  // const [url, setUrl] = useState("");
   const title = useField("text");
   const author = useField("text");
   const url = useField("text");
@@ -12,15 +10,12 @@ const BlogForm = ({ createBlog }) => {
   const addBlog = (event) => {
     event.preventDefault();
     createBlog({
-      title: title,
-      author: author,
-      url: url,
+      title: title.value,
+      author: author.value,
+      url: url.value,
     });
-    // setTitle("");
     title.reset();
-    // setAuthor("");
     author.reset();
-    // setUrl("");
     url.reset();
   };
 
@@ -29,34 +24,33 @@ const BlogForm = ({ createBlog }) => {
       <div>
         <h2>create a new blog</h2>
         <p>
-          title:{" "}
-          <input
+          <TextField
             type={title.type}
             value={title.value}
-            placeholder="Title"
+            label="Title"
             onChange={title.onChange}
           />
         </p>
         <p>
-          author:{" "}
-          <input
+          <TextField
             type={author.type}
             value={author.value}
-            placeholder="Author"
+            label="Author"
             onChange={author.onChange}
           />
         </p>
         <p>
-          url:{" "}
-          <input
+          <TextField
             type={url.type}
             value={url.value}
-            placeholder="Url"
+            label="Url"
             onChange={url.onChange}
           />
         </p>
       </div>
-      <button type="submit">create</button>
+      <Button type="submit" variant="contained" style={{ marginTop: 10 }}>
+        Create
+      </Button>
     </form>
   );
 };

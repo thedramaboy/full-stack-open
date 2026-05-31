@@ -1,25 +1,21 @@
-// import useNotificationStore from "../stores/notificationStore";
 import { useNotification } from "../context/NotificationContext";
+import { Alert } from "@mui/material";
 
-const Notification = ({ message }) => {
-  // const notification = useNotificationStore((state) => state.notification);
+const Notification = () => {
   const notification = useNotification();
-
-  // const messageStyle = {
-  //   color: "green",
-  //   background: "lightgrey",
-  //   fontSize: "20px",
-  //   borderStyle: "solid",
-  //   borderRadius: "5px",
-  //   padding: "10px",
-  //   marginBottom: "10px",
-  // };
 
   if (notification === null) {
     return null;
   }
 
-  return <div>{notification.text}</div>;
+  return (
+    <Alert
+      style={{ marginTop: 10, marginBottom: 10 }}
+      severity={notification.type}
+    >
+      {notification.text}
+    </Alert>
+  );
 };
 
 export default Notification;
