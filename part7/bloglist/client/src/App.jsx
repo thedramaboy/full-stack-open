@@ -8,19 +8,22 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import BlogDetails from "./components/BlogDetails";
 import ErrorBoundary from "./components/ErrorBoundary";
-import useNotificationStore from "./stores/notificationStore";
-import useBlogStore from "./stores/blogStore";
-import useUserStore from "./stores/userStore";
+// import useNotificationStore from "./stores/notificationStore";
+// import useBlogStore from "./stores/blogStore";
+// import useUserStore from "./stores/userStore";
 import {
   useNotificationDispatch,
   setNotification,
 } from "./context/NotificationContext";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useUser, useUserDispatch } from "./context/UserContext";
+import { getUser, saveUser, removeUser } from "./services/persistentUser";
+import useField from "./hooks/useField";
 
 const App = () => {
   // const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  // const [username, setUsername] = useState("");
+  // const [password, setPassword] = useState("");
   // const [user, setUser] = useState(null);
   // const [message, setMessage] = useState({ text: null, type: null });
   // const blogFormRef = useRef();
@@ -28,16 +31,20 @@ const App = () => {
   // const setNotification = useNotificationStore(
   //   (state) => state.setNotification,
   // );
-  const initializeBlogs = useBlogStore((state) => state.initializeBlogs);
-  const createBlog = useBlogStore((state) => state.addBlog);
-  const blogs = useBlogStore((state) => state.blogs);
-  const deleteBlog = useBlogStore((state) => state.deleteBlog);
-  const updateBlog = useBlogStore((state) => state.updateBlog);
-  const user = useUserStore((state) => state.user);
-  const setUser = useUserStore((state) => state.setUser);
-  const clearUser = useUserStore((state) => state.clearUser);
+  // const initializeBlogs = useBlogStore((state) => state.initializeBlogs);
+  // const createBlog = useBlogStore((state) => state.addBlog);
+  // const blogs = useBlogStore((state) => state.blogs);
+  // const deleteBlog = useBlogStore((state) => state.deleteBlog);
+  // const updateBlog = useBlogStore((state) => state.updateBlog);
+  // const user = useUserStore((state) => state.user);
+  // const setUser = useUserStore((state) => state.setUser);
+  // const clearUser = useUserStore((state) => state.clearUser);
   const dispatch = useNotificationDispatch();
   const queryClient = useQueryClient();
+  const user = useUser();
+  const userDispatch = useUserDispatch();
+  const username = useField("text");
+  const password = useField("password");
 
   const { data: blogs = [] } = useQuery({
     queryKey: ["blogs"],
@@ -45,30 +52,31 @@ const App = () => {
   });
 
   const createBlogMutation = useMutation({
-    mutationFn: (blogObject) => blogObject.create(blogObject),
+    mutationFn: (blogObject) => blogService.create(blogObject),
     onSuccess: (newBlog) => {
       queryClient.invalidateQueries({ queryKey: ["blogs"] });
       setNotification(
         dispatch,
-        `a new blog ${blogAdded.title} by ${blogAdded.author} added`,
+        `a new blog ${newBlog.title} by ${newBlog.author} added`,
         "success",
       );
     },
     onError: () => {
-      etNotification(dispatch, "failed to create blog", "error");
+      setNotification(dispatch, "failed to create blog", "error");
     },
   });
 
-  useEffect(() => {
-    // blogService.getAll().then((blogs) => setBlogs(blogs));
-    initializeBlogs();
-  }, []);
+  // useEffect(() => {
+  //   blogService.getAll().then((blogs) => setBlogs(blogs));
+  //   initializeBlogs();
+  // }, []);
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogAppUser");
+    const loggedUserJSON = getUser();
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      // setUser(user);
+      userDispatch({ type: "SET", user });
       blogService.setToken(user.token);
     }
   }, []);
@@ -76,21 +84,28 @@ const App = () => {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const user = await loginService.login({ username, password });
-      window.localStorage.setItem("loggedBlogAppUser", JSON.stringify(user));
+      const user = await loginService.login({
+        username: username.value,
+        password: password.value,
+      });
+      saveUser(user);
       blogService.setToken(user.token);
-      setUser(user);
+      // setUser(user);
+      userDispatch({ type: "SET", user });
       navigate("/");
-      setUsername("");
-      setPassword("");
+      // setUsername("");
+      // setPassword("");
+      username.reset();
+      password.reset();
     } catch {
       setNotification(dispatch, "wrong username or password", "error");
     }
   };
 
   const handleLogout = () => {
-    window.localStorage.removeItem("loggedBlogAppUser");
-    clearUser();
+    removeUser();
+    // clearUser();
+    userDispatch({ type: "CLEAR" });
   };
 
   const addBlog = async (blogObject) => {
@@ -116,10 +131,28 @@ const App = () => {
   //   setBlogs(blogs.map((blog) => (blog.id !== id ? blog : updatedBlog)));
   // };
 
+  const updateBlogMutation = useMutation({
+    mutationFn: ({ id, blogObject }) => blogService.update(id, blogObject),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["blogs"] }),
+  });
+
+  const updateBlog = (id, blogObject) => {
+    updateBlogMutation.mutate({ id, blogObject });
+  };
+
   // const deleteBlog = async (id) => {
   //   await blogService.deleteBlog(id);
   //   setBlogs(blogs.filter((blog) => blog.id !== id));
   // };
+
+  const deleteBlogMutation = useMutation({
+    mutationFn: (id) => blogService.deleteBlog(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["blogs"] }),
+  });
+
+  const deleteBlog = (id) => {
+    deleteBlogMutation.mutate(id);
+  };
 
   return (
     <div>
@@ -160,11 +193,6 @@ const App = () => {
                   handleLogin={handleLogin}
                   username={username}
                   password={password}
-                  handleUsernameChange={({ target }) =>
-                    setUsername(target.value)
-                  }
-                  handlePasswordChange={({ target }) =>
-                    setPassword(target.value)
                   }
                 />
               }

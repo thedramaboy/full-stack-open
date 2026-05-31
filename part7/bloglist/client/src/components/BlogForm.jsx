@@ -1,9 +1,13 @@
 import { useState } from "react";
+import useField from "../hooks/useField";
 
 const BlogForm = ({ createBlog }) => {
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
+  // const [title, setTitle] = useState("");
+  // const [author, setAuthor] = useState("");
+  // const [url, setUrl] = useState("");
+  const title = useField("text");
+  const author = useField("text");
+  const url = useField("text");
 
   const addBlog = (event) => {
     event.preventDefault();
@@ -12,9 +16,12 @@ const BlogForm = ({ createBlog }) => {
       author: author,
       url: url,
     });
-    setTitle("");
-    setAuthor("");
-    setUrl("");
+    // setTitle("");
+    title.reset();
+    // setAuthor("");
+    author.reset();
+    // setUrl("");
+    url.reset();
   };
 
   return (
@@ -24,28 +31,28 @@ const BlogForm = ({ createBlog }) => {
         <p>
           title:{" "}
           <input
-            type="text"
-            value={title}
-            placeholder="titleInput"
-            onChange={({ target }) => setTitle(target.value)}
+            type={title.type}
+            value={title.value}
+            placeholder="Title"
+            onChange={title.onChange}
           />
         </p>
         <p>
           author:{" "}
           <input
-            type="text"
-            value={author}
-            placeholder="authorInput"
-            onChange={({ target }) => setAuthor(target.value)}
+            type={author.type}
+            value={author.value}
+            placeholder="Author"
+            onChange={author.onChange}
           />
         </p>
         <p>
           url:{" "}
           <input
-            type="text"
-            value={url}
-            placeholder="urlInput"
-            onChange={({ target }) => setUrl(target.value)}
+            type={url.type}
+            value={url.value}
+            placeholder="Url"
+            onChange={url.onChange}
           />
         </p>
       </div>
