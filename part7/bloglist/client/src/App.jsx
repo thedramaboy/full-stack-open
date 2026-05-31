@@ -17,6 +17,8 @@ import { useUser, useUserDispatch } from "./context/UserContext";
 import { getUser, saveUser, removeUser } from "./services/persistentUser";
 import useField from "./hooks/useField";
 import { AppBar, Button, Container, Toolbar, Box } from "@mui/material";
+import UserList from "./components/UserList";
+import UserDetails from "./components/UserDetails";
 
 const App = () => {
   const navigate = useNavigate();
@@ -133,6 +135,14 @@ const App = () => {
                       <Button
                         color="inherit"
                         component={Link}
+                        to="/allusers"
+                        sx={style}
+                      >
+                        USERS
+                      </Button>
+                      <Button
+                        color="inherit"
+                        component={Link}
                         to="/newBlog"
                         sx={style}
                       >
@@ -181,10 +191,12 @@ const App = () => {
                   />
                 }
               />
+              <Route path="/user/:id" element={<UserDetails />} />
               <Route
                 path="/newBlog"
                 element={<BlogForm createBlog={addBlog} />}
               />
+              <Route path="/allusers" element={<UserList />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </ErrorBoundary>
