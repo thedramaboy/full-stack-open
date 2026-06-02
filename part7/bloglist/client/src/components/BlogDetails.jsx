@@ -59,6 +59,11 @@ const BlogDetails = ({ blogs, user, updateLike, deleteBlog }) => {
           </Button>
         )}
       </p>
+
+      <h3>comments</h3>
+      {blog.comments?.map((comment, index) => (
+        <li key={index}>{comment}</li>
+      ))}
     </Box>
   );
 };
