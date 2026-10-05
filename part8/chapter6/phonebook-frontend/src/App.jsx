@@ -1,11 +1,16 @@
-import { useApolloClient, useQuery } from "@apollo/client/react";
+import {
+  useApolloClient,
+  useQuery,
+  useSubscription,
+} from "@apollo/client/react";
 import { useState } from "react";
 import Notify from "./components/Notify";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
-import { ALL_PERSONS } from "./queries";
 import PhoneForm from "./components/PhoneForm";
 import LoginForm from "./components/LoginForm";
+import { ALL_PERSONS, PERSON_ADDED } from "./queries";
+import { addPersonToCache } from "./utils/apolloCache";
 
 const App = () => {
   const [token, setToken] = useState(
@@ -15,13 +20,21 @@ const App = () => {
   const result = useQuery(ALL_PERSONS);
   const client = useApolloClient();
 
+  useSubscription(PERSON_ADDED, {
+    onData: ({ data }) => {
+      const addedPerson = data.data.personAdded;
+      notify(`${addedPerson.name} added`);
+      addPersonToCache(client.cache, addedPerson);
+    },
+  });
+
   if (result.loading) {
     return <div>loading...</div>;
   }
 
-  if (result.error) return <div>error: {result.error.message}</div>
+  if (result.error) return <div>error: {result.error.message}</div>;
 
-  const persons = result.data?.allPersons ?? []
+  const persons = result.data?.allPersons ?? [];
 
   const notify = (message) => {
     setErrorMessage(message);
