@@ -3,7 +3,7 @@ interface Info {
     weight: number
 }
 
-type Category = 'Underweight (Severe thinness)' | 'Underweight (Moderate thinness)' | 'Underweight (Mild thinness)' | 'Normal range' | 'Overweight (Pre-obese)' | 'Obese (Class I)' | 'Obese (Class II)' | 'Obese (Class III)' 
+type Category = 'Underweight (Severe thinness)' | 'Underweight (Moderate thinness)' | 'Underweight (Mild thinness)' | 'Normal range' | 'Overweight (Pre-obese)' | 'Obese (Class I)' | 'Obese (Class II)' | 'Obese (Class III)';
 
 const parseArguments = (args: string[]): Info => {
   if (args.length < 4) throw new Error('Not enough arguments');
@@ -15,7 +15,7 @@ const parseArguments = (args: string[]): Info => {
   if (!isNaN(height) && !isNaN(weight) && height > 0) {
     return { height, weight };
   } else {
-    throw new Error('Provided values were not numbers or height is zero!');
+    throw new Error('height must be greater than zero!');
   }
 };
 
@@ -31,4 +31,13 @@ const calculateBmi = (height: number, weight: number): Category => {
     else return 'Obese (Class III)';
 }
 
-console.log(calculateBmi(180, 74))
+try {
+    const { height, weight } = parseArguments(process.argv);
+    console.log(calculateBmi(height, weight));
+} catch (error: unknown) {
+  let errorMessage = 'Something bad happened.';
+  if (error instanceof Error) {
+    errorMessage += ' Error: ' + error.message;
+  }
+  console.log(errorMessage);
+}

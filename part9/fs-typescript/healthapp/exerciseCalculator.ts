@@ -21,8 +21,8 @@ const parseArgs = (args: string[]): Data => {
     const mapped = parseArr.map((arg) => Number(arg));
     const negativeNum = (num: number) => num < 0;
     if(mapped.some(isNaN) || mapped.some(negativeNum)) throw new Error("Some members in array are not a number or is negative.");
-    const hoursArr = mapped.slice(0, mapped.length - 1);
-    const target = mapped[mapped.length - 1];
+    const hoursArr = mapped.slice(1, mapped.length);
+    const target = mapped[0];
     return { hoursArr, target };
 };
 
