@@ -19,7 +19,7 @@ const parseArguments = (args: string[]): Info => {
   }
 };
 
-const calculateBmi = (height: number, weight: number): Category => {
+export const calculateBmi = (height: number, weight: number): Category => {
     const result = weight / ((height / 100) * (height / 100));
     if (result < 16) return 'Underweight (Severe thinness)';
     else if (result < 17) return 'Underweight (Moderate thinness)';
@@ -31,7 +31,8 @@ const calculateBmi = (height: number, weight: number): Category => {
     else return 'Obese (Class III)';
 }
 
-try {
+if (process.argv[1] === import.meta.filename) {
+  try {
     const { height, weight } = parseArguments(process.argv);
     console.log(calculateBmi(height, weight));
 } catch (error: unknown) {
@@ -40,4 +41,5 @@ try {
     errorMessage += ' Error: ' + error.message;
   }
   console.log(errorMessage);
+}
 }
