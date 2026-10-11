@@ -1,4 +1,4 @@
-interface Result {
+export interface Result {
     periodLength: number,
     trainingDays: number,
     success: boolean,
@@ -26,7 +26,7 @@ const parseArgs = (args: string[]): Data => {
     return { hoursArr, target };
 };
 
-const calculateExercises = (hoursArr: number[], target: number): Result => {
+export const calculateExercises = (hoursArr: number[], target: number): Result => {
     if (target === 0) throw new Error("Target can't be zero.");
     let rating: Rating;
     let ratingDescription: string;
@@ -61,13 +61,15 @@ const calculateExercises = (hoursArr: number[], target: number): Result => {
     };
 };
 
-try {
-    const { hoursArr, target } = parseArgs(process.argv);
-    console.log(calculateExercises(hoursArr, target));
-} catch (error: unknown) {
-  let errorMessage = 'Something bad happened.';
-  if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message;
-  }
-  console.log(errorMessage);
+if (process.argv[1] === import.meta.filename) {
+    try {
+        const { hoursArr, target } = parseArgs(process.argv);
+        console.log(calculateExercises(hoursArr, target));
+        } catch (error: unknown) {
+        let errorMessage = 'Something bad happened.';
+        if (error instanceof Error) {
+            errorMessage += ' Error: ' + error.message;
+        }
+        console.log(errorMessage);
+    }
 }

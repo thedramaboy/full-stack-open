@@ -29,17 +29,17 @@ export const calculateBmi = (height: number, weight: number): Category => {
     else if (result < 35) return 'Obese (Class I)';
     else if (result < 40) return 'Obese (Class II)';
     else return 'Obese (Class III)';
-}
+};
 
 if (process.argv[1] === import.meta.filename) {
   try {
     const { height, weight } = parseArguments(process.argv);
     console.log(calculateBmi(height, weight));
-} catch (error: unknown) {
-  let errorMessage = 'Something bad happened.';
-  if (error instanceof Error) {
-    errorMessage += ' Error: ' + error.message;
+  } catch (error: unknown) {
+    let errorMessage = 'Something bad happened.';
+    if (error instanceof Error) {
+      errorMessage += ' Error: ' + error.message;
+    }
+    console.log(errorMessage);
   }
-  console.log(errorMessage);
-}
 }
