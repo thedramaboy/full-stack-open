@@ -4,13 +4,21 @@ export interface Diagnosis {
     latin?: string;
 }
 
-export type patientWithoutSSN = Omit<Patient, 'ssn'>;
-
 export interface Patient {
     id: string;
     name: string;
     dateOfBirth: string;
     ssn: string;
-    gender: string;
+    gender: Gender;
     occupation: string;
 }
+
+export type PatientWithoutSSN = Omit<Patient, 'ssn'>;
+
+export const Gender = {
+  Male: 'male',
+  Female: 'female',
+  Other: 'other',
+} as const;
+
+export type Gender = typeof Gender[keyof typeof Gender];
