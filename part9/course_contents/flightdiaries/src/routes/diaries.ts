@@ -1,6 +1,7 @@
 import express, {type Response} from 'express';
 import diaryService from '../services/diaryService.ts';
-import { NonSensitiveDiaryEntry } from '../types.ts';
+import { type NonSensitiveDiaryEntry } from '../types.ts';
+import parseNewDiaryEntry from '../utils.ts';
 
 const router = express.Router();
 

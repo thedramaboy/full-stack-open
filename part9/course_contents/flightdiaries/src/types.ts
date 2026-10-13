@@ -25,6 +25,6 @@ export interface DiaryEntry {
     id: number;
     date: string;
     weather: Weather;
-    visibility: Visisbility;
+    visibility: Visibility;
     comment?: string;
 };

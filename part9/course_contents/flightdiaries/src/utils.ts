@@ -74,10 +74,4 @@ const parseVisibility = (visibility: unknown): Visibility => {
     return visibility;
 };
 
-export default {
-    parseNewDiaryEntry,
-    parseComment,
-    parseDate,
-    parseWeather,
-    parseVisibility
-};
+export default parseNewDiaryEntry;
