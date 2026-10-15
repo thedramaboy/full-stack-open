@@ -1,5 +1,3 @@
-import { NewDiaryEntry, Visibility, Weather } from "./types.ts";
-
 // const parseNewDiaryEntry = (object: unknown): NewDiaryEntry => {
 //     console.log(object); // now object is no longer unused
 //     const newEntry: NewDiaryEntry = {
@@ -11,67 +9,78 @@ import { NewDiaryEntry, Visibility, Weather } from "./types.ts";
 //     return newEntry;
 // };
 
-const parseNewDiaryEntry = (object: unknown): NewDiaryEntry => {
-  if ( !object || typeof object !== 'object' ) {
-    throw new Error('Incorrect or missing data');
-  }
+// export const parseNewDiaryEntry = (object: unknown): NewDiaryEntry => {
+//   return NewEntrySchema.parse(object);
+// };
 
-  if ('comment' in object && 'date' in object && 'weather' in object && 'visibility' in object)  {
-    const newEntry: NewDiaryEntry = {
-      weather: parseWeather(object.weather),
-      visibility: parseVisibility(object.visibility),
-      date: parseDate(object.date),
-      comment: parseComment(object.comment)
-    };
+// const parseNewDiaryEntry = (object: unknown): NewDiaryEntry => {
+//   if ( !object || typeof object !== 'object' ) {
+//     throw new Error('Incorrect or missing data');
+//   }
 
-    return newEntry;
-  }
+//   if ('comment' in object && 'date' in object && 'weather' in object && 'visibility' in object)  {
+//     const newEntry: NewDiaryEntry = {
+//         // weather: parseWeather(object.weather),
+//         // visibility: parseVisibility(object.visibility),
+//         // date: parseDate(object.date),
+//         weather: z.enum(Weather).parse(object.weather),
+//         visibility: z.enum(Visibility).parse(object.visibility),
+//         date: z.iso.date().parse(object.date),
+//         comment: z.string().parse(object.comment)
+//     };
 
-  throw new Error('Incorrect data: some fields are missing');
-};
+//     return newEntry;
+//   }
 
-const isString = (text: unknown): text is string => {
-    return typeof text === 'string' || text instanceof String;
-};
+//   throw new Error('Incorrect data: some fields are missing');
+// };
 
-const isDate = (date: string): boolean => {
-    return Boolean(Date.parse(date));
-};
+// const isString = (text: unknown): text is string => {
+//     return typeof text === 'string' || text instanceof String;
+// };
 
-const isWeather = (param: string): param is Weather => {
-    return (Object.values(Weather) as string[]).includes(param);
-};
+// const isDate = (date: string): boolean => {
+//     return Boolean(Date.parse(date));
+// };
 
-const isVisibility = (param: string): param is Visibility => {
-    return (Object.values(Visibility) as string[]).includes(param);
-};
+// const isWeather = (param: string): param is Weather => {
+//     return (Object.values(Weather) as string[]).includes(param);
+// };
 
-const parseDate = (date: unknown): string => {
-    if (!date || !isString(date) || !isDate(date)) {
-        throw new Error('Inccorect or missing date: ' + date);
-    }
-    return date;
-};
+// const isVisibility = (param: string): param is Visibility => {
+//     return (Object.values(Visibility) as string[]).includes(param);
+// };
 
-const parseComment = (comment: unknown): string => {
-  if (!comment || !isString(comment)) {
-    throw new Error('Incorrect or missing comment');
-  }
-  return comment;
-};
+// const parseDate = (date: unknown): string => {
+//     if (!date || !isString(date) || !isDate(date)) {
+//         throw new Error('Inccorect or missing date: ' + date);
+//     }
+//     return date;
+// };
 
-const parseWeather = (weather: unknown): Weather => {
-    if (!weather || !isString(weather) || !isWeather(weather)) {
-        throw new Error('Incorrect or missing weather: ' + weather);
-    }
-    return weather;
-};
+// const parseComment = (comment: unknown): string => {
+//   if (!comment || !isString(comment)) {
+//     throw new Error('Incorrect or missing comment');
+//   }
+//   return comment;
+// };
 
-const parseVisibility = (visibility: unknown): Visibility => {
-    if (!isString(visibility) || !isVisibility(visibility)) {
-        throw new Error('Incorrect or missing visibility: ' + visibility); 
-    }
-    return visibility;
-};
+// const parseComment = (comment: unknown): string => {
+//     return z.string().parse(comment);
+// };
 
-export default parseNewDiaryEntry;
+// const parseWeather = (weather: unknown): Weather => {
+//     if (!weather || !isString(weather) || !isWeather(weather)) {
+//         throw new Error('Incorrect or missing weather: ' + weather);
+//     }
+//     return weather;
+// };
+
+// const parseVisibility = (visibility: unknown): Visibility => {
+//     if (!isString(visibility) || !isVisibility(visibility)) {
+//         throw new Error('Incorrect or missing visibility: ' + visibility); 
+//     }
+//     return visibility;
+// };
+
+// export default parseNewDiaryEntry;
