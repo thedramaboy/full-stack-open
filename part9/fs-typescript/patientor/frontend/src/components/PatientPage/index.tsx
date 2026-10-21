@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Patient } from "../../types";
+import { Diagnosis, Patient } from "../../types";
 import { useParams } from "react-router-dom";
 import patientService from "../../services/patientService";
+import diagnoseService from "../../services/diagnoseService";
 
 const PatientPage = () => {
     const { id } = useParams();
     const [patient, setPatient] = useState<Patient | null>(null);
     const [error, setError] = useState('');
+    const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
 
     useEffect(() => {
         if (!id) {
@@ -16,6 +18,12 @@ const PatientPage = () => {
             .then((data) => setPatient(data))
             .catch(() => setError('Patient not found'));
     }, [id]);
+
+    useEffect(() => {
+        diagnoseService.getAll()
+        .then((data) => setDiagnoses(data))
+        .catch(() => setError('Diagnose not found'));
+    }, []);
 
     if (error) {
         return <p>{error}</p>;
@@ -39,7 +47,7 @@ const PatientPage = () => {
                     {entry.date} {entry.description}
                     <ul>
                         {entry.diagnosisCodes?.map((code) => (
-                            <li key={code}>{code}</li>
+                            <li key={code}>{code} {diagnoses.find((diagnose) => diagnose.code === code)?.name}</li>
                         ))}
                     </ul>
                 </div>
