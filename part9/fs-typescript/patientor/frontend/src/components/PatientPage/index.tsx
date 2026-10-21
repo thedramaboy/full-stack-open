@@ -25,12 +25,25 @@ const PatientPage = () => {
         return <p>Loading...</p>;
     }
 
+    const { entries } = patient;
+
     return (
         <div>
             <h2>{patient.name} {patient.gender}</h2>
             <p>ssn: {patient.ssn}</p>
             <p>occupation: {patient.occupation}</p>
-            <p>date of birth: {patient.dateOfBirth}</p>
+            {/* <p>date of birth: {patient.dateOfBirth}</p> */}
+            <h3>entries</h3>
+            {entries.map((entry) => (
+                <div key={entry.id}>
+                    {entry.date} {entry.description}
+                    <ul>
+                        {entry.diagnosisCodes?.map((code) => (
+                            <li key={code}>{code}</li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
         </div>
     );
 };
