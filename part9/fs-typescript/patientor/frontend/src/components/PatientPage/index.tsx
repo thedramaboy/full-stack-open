@@ -3,6 +3,7 @@ import { Diagnosis, Patient } from "../../types";
 import { useParams } from "react-router-dom";
 import patientService from "../../services/patientService";
 import diagnoseService from "../../services/diagnoseService";
+import EntryDetails from "../EntryDetails";
 
 const PatientPage = () => {
     const { id } = useParams();
@@ -50,6 +51,7 @@ const PatientPage = () => {
                             <li key={code}>{code} {diagnoses.find((diagnose) => diagnose.code === code)?.name}</li>
                         ))}
                     </ul>
+                    <EntryDetails entry={entry}/>
                 </div>
             ))}
         </div>
