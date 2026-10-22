@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
-import { Diagnosis, Patient } from "../../types";
+import { Diagnosis, EntryWithoutId, Patient } from "../../types";
 import { useParams } from "react-router-dom";
 import patientService from "../../services/patientService";
 import diagnoseService from "../../services/diagnoseService";
 import EntryDetails from "../EntryDetails";
+import axios from "axios";
+import AddEntryForm from "./AddEntryForm";
 
 const PatientPage = () => {
     const { id } = useParams();
     const [patient, setPatient] = useState<Patient | null>(null);
     const [error, setError] = useState('');
     const [diagnoses, setDiagnoses] = useState<Diagnosis[]>([]);
+    const [formError, setFormError] = useState('');
 
     useEffect(() => {
         if (!id) {
@@ -22,8 +25,8 @@ const PatientPage = () => {
 
     useEffect(() => {
         diagnoseService.getAll()
-        .then((data) => setDiagnoses(data))
-        .catch(() => setError('Diagnose not found'));
+        .then(setDiagnoses)
+        .catch(() => setDiagnoses([]));
     }, []);
 
     if (error) {
@@ -35,6 +38,36 @@ const PatientPage = () => {
     }
 
     const { entries } = patient;
+
+    const showFormError = (message: string) => {
+        setFormError(message);
+        setTimeout(() => {
+            setFormError('');
+        }, 5000);
+    };
+
+    const handleSubmit = (values: EntryWithoutId) => {
+        patientService.createEntry(patient.id, values)
+            .then((newEntry) => {
+                setPatient({ ...patient, entries: patient.entries.concat(newEntry) });
+                setFormError('');
+            })
+            .catch((error: unknown) => {
+                if (axios.isAxiosError(error)) {
+                    const data = error.response?.data;
+                    if (typeof data === 'object' && data !== null && 'error' in data && Array.isArray(data.error)) {
+                        showFormError(data.error.map((issue: unknown) => {
+                            if (typeof issue === 'object' && issue !== null && 'message' in issue && typeof issue.message === 'string') {
+                                return issue.message;
+                            }
+                            return 'Unknown error';
+                        }).join(', '));
+                        return;
+                    }
+                }
+                showFormError('Unknown error');
+            });
+    };
 
     return (
         <div>
@@ -54,6 +87,7 @@ const PatientPage = () => {
                     <EntryDetails entry={entry}/>
                 </div>
             ))}
+            <AddEntryForm onSubmit={handleSubmit} error={formError} />
         </div>
     );
 };
