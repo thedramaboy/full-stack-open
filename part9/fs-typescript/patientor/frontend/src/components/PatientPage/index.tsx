@@ -87,7 +87,7 @@ const PatientPage = () => {
                     <EntryDetails entry={entry}/>
                 </div>
             ))}
-            <AddEntryForm onSubmit={handleSubmit} error={formError} />
+            <AddEntryForm onSubmit={handleSubmit} error={formError} diagnoses={diagnoses} />
         </div>
     );
 };
