@@ -15,12 +15,8 @@ router.get('/', async (_req, res) => {
 })
 
 router.post('/', async (req, res) => {
-  try {
     const blog = await Blogs.create(req.body)
     res.json(blog)
-  } catch (error) {
-    res.status(400).json({ error })
-  }
 })
 
 router.get('/:id', blogFinder, async (req, res) => {
