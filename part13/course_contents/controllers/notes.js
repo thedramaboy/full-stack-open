@@ -1,6 +1,7 @@
 const router = require('express').Router()
 
 const { Note, User } = require('../models')
+const tokenExtractor = require('../util/middleware');
 
 const noteFinder = async (req, res, next) => {
   req.note = await Note.findByPk(req.params.id)
@@ -11,19 +12,26 @@ const noteFinder = async (req, res, next) => {
 }
 
 router.get('/', async (req, res) => {
-  const notes = await Note.findAll()
+  const notes = await Note.findAll({
+    attributes: { exclude: ['userId'] },
+    include: {
+      model: User,
+      attributes: ['name']
+    }
+  })
   res.json(notes)
 })
 
-router.post('/', async (req, res) => {
+router.post('/', tokenExtractor, async (req, res) => {
   try {
-    const user = await User.findOne()    
+    const user = await User.findByPk(req.decodedToken.id);   
     const note = await Note.create({...req.body, date: new Date(), userId: user.id})        
     res.json(note)
   } catch(error) {
     return res.status(400).json({ error })
   }
 })
+
 router.get('/:id', noteFinder, async (req, res) => {
   res.json(req.note)
 })
