@@ -1,39 +1,35 @@
-const bcrypt = require("bcrypt");
-const usersRouter = require("express").Router();
-const User = require("../models/users");
+const { User } = require('../models');
 
-usersRouter.get("/", async (request, response) => {
-  const users = await User.find({});
-  response.json(users);
-});
+const router = require('express').Router();
 
-usersRouter.post("/", async (request, response) => {
-  const { username, name, password } = request.body;
+router.get('/', async (req, res) => {
+  const users = await User.findAll()
+  res.json(users);
+})
 
-  if (!username || !password) {
-    return response
-      .status(400)
-      .json({ error: "username and password are required" });
+router.post('/', async (req, res) => {
+  const user = await User.create(req.body)
+  res.json(user)
+})
+
+router.get('/:id', async (req, res) => {
+  const user = await User.findByPk(req.params.id)
+  if (user) {
+    res.json(user)
+  } else {
+    res.status(404).json("User not found")
   }
+})
 
-  if (username.length < 3 || password.length < 3) {
-    return response.status(400).json({
-      error: "username and password must be at least 3 characters long",
-    });
+router.put('/:username', async (req, res) => {
+  const user = await User.findOne({ where: { username: req.params.username }})
+  if (user) {
+    user.name = req.body.username
+    await user.save()
+    res.json(user)
+  } else {
+    res.status(404).json({ error: 'User not found'})
   }
+})
 
-  const saltRounds = 10;
-  const passwordHash = await bcrypt.hash(password, saltRounds);
-
-  const user = new User({
-    username,
-    name,
-    passwordHash,
-  });
-
-  const savedUser = await user.save();
-
-  response.status(201).json(savedUser);
-});
-
-module.exports = usersRouter;
+module.exports = router

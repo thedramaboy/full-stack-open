@@ -1,22 +1,13 @@
 // const logger = require("./logger");
 // const User = require("../models/users");
-// const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
+const { SECRET } = require('../utils/config');
 
 // const requestLogger = (request, response, next) => {
 //   logger.info("Method:", request.method);
 //   logger.info("Path:  ", request.path);
 //   logger.info("Body:  ", request.body);
 //   logger.info("---");
-//   next();
-// };
-
-// const tokenExtractor = (request, response, next) => {
-//   const authorization = request.get("authorization");
-//   if (authorization && authorization.startsWith("Bearer ")) {
-//     request.token = authorization.replace("Bearer ", "");
-//   } else {
-//     request.token = null;
-//   }
 //   next();
 // };
 
@@ -52,10 +43,24 @@ const errorHandler = (error, request, response, next) => {
   next(error);
 };
 
+const tokenExtractor = (req, res, next) => {
+  const authorization = req.get('authorization');
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    try {
+      req.decodedToken = jwt.verify(authorization.substring(7), SECRET);
+    } catch {
+      return res.status(401).json({ error: 'token invalid' });
+    }
+  } else {
+    return res.status(401).json({ error: 'token missing '});
+  }
+  next()
+}
+
 module.exports = {
   // requestLogger,
   // unknownEndpoint,
   errorHandler,
-  // tokenExtractor,
+  tokenExtractor,
   // userExtractor,
 };
