@@ -49,7 +49,8 @@ User.init({
   username: {
     type: DataTypes.STRING,
     allowNull: false,
-    validate: { notEmpty: true }
+    unique: true,
+    validate: { isEmail: true, notEmpty: true }
   }
 }, {
   sequelize,

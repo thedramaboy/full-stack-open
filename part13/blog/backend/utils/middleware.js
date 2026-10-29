@@ -36,7 +36,11 @@ const errorHandler = (error, request, response, next) => {
   }  else if (error.name === "JsonWebTokenError") {
     return response.status(401).json({ error: "token invalid" });
   } else if (error.name === 'SequelizeValidationError' ||
-      error.name === 'SequelizeDatabaseError') {
+           error.name === 'SequelizeUniqueConstraintError') {
+    return response.status(400).json({
+      error: error.errors.map((e) => e.message)
+    })
+  } else if (error.name === 'SequelizeDatabaseError') {
     return response.status(400).json({ error: error.message })
   }
 
