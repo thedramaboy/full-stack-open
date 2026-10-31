@@ -11,8 +11,11 @@ const blogFinder = async (req, res, next) => {
 }
 
 router.get('/', async (_req, res) => {
-  const blogs = await Blogs.findAll()
-  res.json(blogs)
+  const blogs = await Blogs.findAll({
+    attributes: { exclude: 'userId'},
+    include: { model: User, attributes: ['name']}
+  })
+  res.json(blogs);
 })
 
 router.post('/', tokenExtractor, async (req, res) => {
@@ -31,7 +34,10 @@ router.put('/:id', blogFinder, async (req, res) => {
   res.json(req.blog)
 })
 
-router.delete('/:id', blogFinder, async (req, res) => {
+router.delete('/:id', tokenExtractor, blogFinder, async (req, res) => {
+    if (req.blog.userId !== req.decodedToken.id) {
+      return res.status(403).json({ error: 'only the creator can delete this blog' })
+    }
     await req.blog.destroy()
     res.status(204).end()
 })
