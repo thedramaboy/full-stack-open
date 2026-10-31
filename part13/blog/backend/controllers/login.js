@@ -8,13 +8,17 @@ router.post("/", async (req, res) => {
   const { username, password } = req.body;
 
   const user = await User.findOne({ where: { username } })
-  const passwordCorrect =
-    password === 'secret' ? true : false;
+  // const passwordCorrect =
+  //   password === 'secret' ? true : false;
 
-  if (!(user && passwordCorrect)) {
-    return res.status(401).json({
-      error: "invalid username or password",
-    });
+  // if (!(user && passwordCorrect)) {
+  //   return res.status(401).json({
+  //     error: "invalid username or password",
+  //   });
+  // }
+
+  if (!user) {
+    return res.status(401).json({ error: 'invalid username or password' })
   }
 
   const userForToken = {
