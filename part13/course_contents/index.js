@@ -3,7 +3,6 @@ const app = express();
 
 const { PORT } = require('./util/config.js');
 const { connectToDatabase } = require('./util/db.js');
-const { syncModels } = require('./models/index.js');
 
 const notesRouter = require('./controllers/notes');
 const usersRouter = require('./controllers/users')
@@ -17,7 +16,6 @@ app.use('/api/login', loginRouter)
 
 const start = async () => {
   await connectToDatabase();
-  await syncModels()
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

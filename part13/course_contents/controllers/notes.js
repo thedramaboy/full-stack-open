@@ -1,7 +1,7 @@
 const router = require('express').Router()
 
 const { Note, User } = require('../models')
-const tokenExtractor = require('../util/middleware')
+const { tokenExtractor } = require('../util/middleware')
 
 const { Op } = require('sequelize')
 
