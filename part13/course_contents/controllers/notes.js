@@ -16,10 +16,6 @@ const noteFinder = async (req, res, next) => {
 router.get('/', async (req, res) => {
   const where = {}
 
-  let important = { 
-    [Op.in]: [true, false] 
-  }
-
   if (req.query.important) {
     where.important = req.query.important === "true"
   }
